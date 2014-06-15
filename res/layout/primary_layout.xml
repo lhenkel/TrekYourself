@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:foo="http://schemas.android.com/apk/res/com.example.trekyourself"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:minWidth="180dip"
+    android:minHeight="100dip"
+    android:background="@drawable/lcarstemplate"     >
+ 
+
+            <Space
+                android:layout_width="1dip"
+                android:layout_height="wrap_content"
+                android:id="@+id/baseSpace"
+                 />
+    
+    <com.example.trekyourself.TextViewTrek
+        android:id="@+id/textViewTrekDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="June 16, 2014" 
+        android:textColor="@color/header_col"
+        android:textSize="60sp" 
+        foo:customFont="swissbt.ttf"
+        android:layout_below="@id/baseSpace"
+        android:layout_marginLeft="800px"
+        android:layout_marginTop="34px"
+        />
+               
+    <com.example.trekyourself.TextViewTrek
+        android:id="@+id/textViewTrekTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="17:20" 
+        android:textColor="@color/header_col"
+        android:textSize="60sp" 
+        android:layout_below="@id/baseSpace"
+        foo:customFont="swissbt.ttf"
+        android:layout_marginLeft="1360px"
+        android:layout_marginTop="34px"
+        
+        />    
+    
+    
+
+</RelativeLayout>
