@@ -6,6 +6,7 @@
     android:orientation="horizontal"
     android:minWidth="180dip"
     android:minHeight="100dip"
+    android:keepScreenOn="true"
     android:background="@drawable/lcarstemplate"     >
  
 

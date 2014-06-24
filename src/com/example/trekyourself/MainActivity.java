@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,20 +12,67 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ScheduledFuture;
+
+import android.os.Handler;
+
 public class MainActivity extends Activity {
 
+	public Handler mHandler = new Handler() {
+	    public void handleMessage(Message msg) {
+	        updateTime();
+	    }
+	};	
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
-        setContentView(R.layout.primary_layout);
+        setContentView(R.layout.primary_layout);	//textViewTrekDate
+        
         /*if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }*/
+        
+        ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(5);
+        Runnable periodicTask = new Runnable(){
+            @Override
+            public void run() {
+                try{
+                	mHandler.obtainMessage(1).sendToTarget();
+                    Thread.sleep(30 * 1000);
+
+                } catch(Exception e){
+                     
+                }
+            }
+        };        
+        ScheduledFuture<?> periodicFuture = sch.scheduleAtFixedRate(periodicTask, 5, 5, TimeUnit.SECONDS);
+        //updateTime();
     }
 
+    private void updateTime() {
+        TextViewTrek tvDate = (TextViewTrek) findViewById(R.id.textViewTrekDate);
+        TextViewTrek tvTime = (TextViewTrek) findViewById(R.id.textViewTrekTime);
+        //MMM dd hh:mm:ss yyyy 
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy");
+        String currentDateStr = sdf.format(new Date());
+        tvDate.setText(currentDateStr);
+
+        SimpleDateFormat stf = new SimpleDateFormat("HH:mm");
+        String currentTimeStr = stf.format(new Date());
+        tvTime.setText(currentTimeStr);
+    	
+    	
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
