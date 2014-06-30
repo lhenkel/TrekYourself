@@ -11,8 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.util.Log;
+import org.apache.http.HttpResponse;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.Executors;
@@ -20,7 +24,15 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ScheduledFuture;
 
+import android.os.AsyncTask;
 import android.os.Handler;
+
+import java.util.List;
+
+import android.net.http.AndroidHttpClient;
+
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
 
 public class MainActivity extends Activity {
 
@@ -33,14 +45,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
+
         setContentView(R.layout.primary_layout);	//textViewTrekDate
-        
-        /*if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
-                    .commit();
-        }*/
+        Log.d("TREK", "State : Here");
+        updateTime();
         
         ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(5);
         Runnable periodicTask = new Runnable(){
@@ -59,6 +67,40 @@ public class MainActivity extends Activity {
         //updateTime();
     }
 
+	private class HttpGetTask extends AsyncTask<Void, Void, HashMap<String, MonitoredServer>> {
+
+		private static final String TAG = "HttpGetTask";
+
+		private static final String URL = "http://63.226.80.152:8080/nagios/status.xml";	
+
+		AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
+
+		@Override
+		protected HashMap<String, MonitoredServer> doInBackground(Void... params) {
+			HttpGet request = new HttpGet(URL);
+			XMLResponseHandler responseHandler = new XMLResponseHandler();
+			try {
+				return mClient.execute(request, responseHandler);
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute( HashMap<String, MonitoredServer> result) {
+			if (null != mClient)
+				mClient.close();
+			//setListAdapter(new ArrayAdapter<String>(
+			//		NetworkingAndroidHttpClientXMLActivity.this,
+			//		R.layout.list_item, result));
+		}
+	}
+       
+    
+    
     private void updateTime() {
         TextViewTrek tvDate = (TextViewTrek) findViewById(R.id.textViewTrekDate);
         TextViewTrek tvTime = (TextViewTrek) findViewById(R.id.textViewTrekTime);

@@ -6,9 +6,14 @@ public class MonitoredServer {
 	private String serverStatus;
 	private String serverMessage;
 	
-	public void MonitoredServer(String serverNameIn) {
+	MonitoredServer(String serverNameIn) {
 		serverName = serverNameIn;
 	}
+
+	MonitoredServer() {
+		
+	}
+	
 	
 	public void setServerStatus(String statusIn) {
 		serverStatus = statusIn;
@@ -17,6 +22,10 @@ public class MonitoredServer {
 	public void setServerMessage(String messageIn) {
 		serverMessage = messageIn;
 	}
+
+	public void setServerName(String nameIn) {
+		serverName = nameIn;
+	}	
 	
 	public String getName() {
 		return serverName;
