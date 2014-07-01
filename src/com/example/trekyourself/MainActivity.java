@@ -105,12 +105,14 @@ public class MainActivity extends Activity {
 
 		@Override
 		protected void onPostExecute( HashMap<String, MonitoredServer> result) {
-			serverMap = result;
 			
+			HashMap<String, MonitoredServer> resServerMap = (HashMap<String, MonitoredServer>) result;
+			
+			 
 			TextView text1 = (TextView) findViewById(R.id.hellothere);
-
-			text1.setText( "Test123" );
-		    Iterator it = serverMap.entrySet().iterator();
+			
+			text1.setText( "Test111" + Integer.toString(resServerMap.size()) );
+		    Iterator it = resServerMap.entrySet().iterator();
 		    MonitoredServer curServer = null;
 		    while (it.hasNext()) {
 		        Map.Entry pairs = (Map.Entry)it.next();
