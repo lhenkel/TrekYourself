@@ -3,7 +3,7 @@
     package="com.example.trekyourself"
     android:versionCode="1"
     android:versionName="1.0" >
-
+<uses-permission android:name="android.permission.INTERNET" />
     <uses-sdk
         android:minSdkVersion="15"
         android:targetSdkVersion="15" />
@@ -20,6 +20,7 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+                
             </intent-filter>
         </activity>
     </application>

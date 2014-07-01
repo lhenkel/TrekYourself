@@ -41,8 +41,16 @@
         android:layout_marginLeft="1360px"
         android:layout_marginTop="34px"
         
-        />    
-    
-    
+        />
+
+    <TextView
+        android:id="@+id/hellothere"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textViewTrekDate"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="96dp"
+        android:text="TextView"
+        android:textColor="@color/opaque_red" />
 
 </RelativeLayout>

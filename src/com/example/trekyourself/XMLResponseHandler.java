@@ -29,9 +29,11 @@ import org.w3c.dom.Element;
 import com.example.trekyourself.*;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import android.util.Log;
 
 
@@ -47,6 +49,7 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 		throws ClientProtocolException, IOException {
 		try {
 
+			Log.d("TREK", "Running Here!");
 			// Create the Pull Parser
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 			XmlPullParser xpp = factory.newPullParser();
@@ -58,10 +61,15 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 			serverHash = new HashMap<String, MonitoredServer>();
 			
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			
-			Document doc = dBuilder.parse(new InputStreamReader(response.getEntity()
-					.getContent()).toString());
+			InputStream in = response.getEntity().getContent();
+			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); //**<--What class is this?**
+		    Document doc = builder.parse(in); //if we step through to here, this line executes then goes directly to "x" below
+
+//			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			
+	//		Document doc = dBuilder.parse(new InputStreamReader(response.getEntity()
+		//			.getContent()).toString());
 			 
 			//optional, but recommended
 			//read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
@@ -74,7 +82,7 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 			NodeList nList = doc.getElementsByTagName("host");
 		 
 			for (int temp = 0; temp < nList.getLength(); temp++) {
-		 
+				Log.d("TREK", "Running Here! Num=" + Integer.toString(temp));
 				Node nNode = nList.item(temp);
 		 
 				System.out.println("\nCurrent Element :" + nNode.getNodeName());
@@ -147,7 +155,7 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 	    	e.printStackTrace();
 	    }
 		 
-	    Iterator it = serverHash.entrySet().iterator();
+	    /*Iterator it = serverHash.entrySet().iterator();
 	    MonitoredServer curServer = null;
 	    while (it.hasNext()) {
 	        Map.Entry pairs = (Map.Entry)it.next();
@@ -158,7 +166,7 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 	        //System.out.println(curServer.getStatus());
 	        Log.d("TREK", (String) curServer.getStatus());
 	        it.remove(); // avoids a ConcurrentModificationException
-	    }		 
+	    }		*/ 
 	    
 	    return serverHash;
 	}	

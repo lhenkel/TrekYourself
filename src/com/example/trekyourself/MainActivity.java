@@ -10,12 +10,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.os.Build;
 import android.util.Log;
+
 import org.apache.http.HttpResponse;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -36,6 +41,8 @@ import org.apache.http.client.methods.HttpGet;
 
 public class MainActivity extends Activity {
 
+	private HashMap<String, MonitoredServer> serverMap;
+	
 	public Handler mHandler = new Handler() {
 	    public void handleMessage(Message msg) {
 	        updateTime();
@@ -49,6 +56,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.primary_layout);	//textViewTrekDate
         Log.d("TREK", "State : Here");
         updateTime();
+        
+        new HttpGetTask().execute();
         
         ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(5);
         Runnable periodicTask = new Runnable(){
@@ -74,12 +83,17 @@ public class MainActivity extends Activity {
 		private static final String URL = "http://63.226.80.152:8080/nagios/status.xml";	
 
 		AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
-
+		
+		
 		@Override
 		protected HashMap<String, MonitoredServer> doInBackground(Void... params) {
+			Log.d("TREK", "State : Here2");
 			HttpGet request = new HttpGet(URL);
 			XMLResponseHandler responseHandler = new XMLResponseHandler();
+			//HashMap<String, MonitoredServer> myMap = (HashMap<String, MonitoredServer>) responseHandler;
+			
 			try {
+				
 				return mClient.execute(request, responseHandler);
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
@@ -91,6 +105,25 @@ public class MainActivity extends Activity {
 
 		@Override
 		protected void onPostExecute( HashMap<String, MonitoredServer> result) {
+			serverMap = result;
+			
+			TextView text1 = (TextView) findViewById(R.id.hellothere);
+
+			text1.setText( "Test123" );
+		    Iterator it = serverMap.entrySet().iterator();
+		    MonitoredServer curServer = null;
+		    while (it.hasNext()) {
+		        Map.Entry pairs = (Map.Entry)it.next();
+		        //System.out.println(pairs.getKey() + " = " + pairs.getValue());
+		        curServer =  (MonitoredServer) pairs.getValue();
+		        //System.out.println(pairs.getKey());
+		        //Log.d("TREK", (String) pairs.getKey());
+		        //System.out.println(curServer.getStatus());
+		        text1.setText(  (String) pairs.getKey() );
+		        Log.d("TREK", " And Finally" + (String) curServer.getStatus());
+		        it.remove(); // avoids a ConcurrentModificationException
+		    }					
+			
 			if (null != mClient)
 				mClient.close();
 			//setListAdapter(new ArrayAdapter<String>(
