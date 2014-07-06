@@ -3,14 +3,21 @@ package com.example.trekyourself;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Message;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.os.Build;
 import android.util.Log;
@@ -42,6 +49,8 @@ import org.apache.http.client.methods.HttpGet;
 public class MainActivity extends Activity {
 
 	private HashMap<String, MonitoredServer> serverMap;
+	
+	private int NUM_SERVER_COLS = 4;
 	
 	public Handler mHandler = new Handler() {
 	    public void handleMessage(Message msg) {
@@ -87,7 +96,7 @@ public class MainActivity extends Activity {
 		
 		@Override
 		protected HashMap<String, MonitoredServer> doInBackground(Void... params) {
-			Log.d("TREK", "State : Here2");
+
 			HttpGet request = new HttpGet(URL);
 			XMLResponseHandler responseHandler = new XMLResponseHandler();
 			//HashMap<String, MonitoredServer> myMap = (HashMap<String, MonitoredServer>) responseHandler;
@@ -108,22 +117,58 @@ public class MainActivity extends Activity {
 			
 			HashMap<String, MonitoredServer> resServerMap = (HashMap<String, MonitoredServer>) result;
 			
-			 
-			TextView text1 = (TextView) findViewById(R.id.hellothere);
+			ImageView image = new ImageView(getApplicationContext());
 			
+			int normalImageId = getResources().getIdentifier("servernormal",  "drawable", getPackageName());
+			int warningImageId = getResources().getIdentifier("serverwarn",  "drawable", getPackageName());
+			int criticalImageId = getResources().getIdentifier("servererror",  "drawable", getPackageName());
+
+			RelativeLayout mainViewScreen = (RelativeLayout) findViewById(R.id.mainViewScreen);
+			
+			TextView text1 = (TextView) findViewById(R.id.hellothere);
 			text1.setText( "Test111" + Integer.toString(resServerMap.size()) );
 		    Iterator it = resServerMap.entrySet().iterator();
 		    MonitoredServer curServer = null;
+	
+		    int curCount = 0;
+		    int numberOfItems = resServerMap.size();
+		    TableLayout systemsTable = (TableLayout) findViewById(R.id.systemsTable);
+	        TableRow curRow = new TableRow(getApplicationContext());
+		    
 		    while (it.hasNext()) {
+		    	//Log.d("TREK", "Here3");
 		        Map.Entry pairs = (Map.Entry)it.next();
-		        //System.out.println(pairs.getKey() + " = " + pairs.getValue());
+
 		        curServer =  (MonitoredServer) pairs.getValue();
-		        //System.out.println(pairs.getKey());
-		        //Log.d("TREK", (String) pairs.getKey());
-		        //System.out.println(curServer.getStatus());
-		        text1.setText(  (String) pairs.getKey() );
-		        Log.d("TREK", " And Finally" + (String) curServer.getStatus());
+		        //text1.setText(  (String) pairs.getKey() );
+		        
+		        if ((curCount % NUM_SERVER_COLS == 0) ) {
+		        	curRow = new TableRow(getApplicationContext());
+		        	systemsTable.addView(curRow);
+		        }
+
+				Button curButton =  new Button(getApplicationContext());
+				
+				if (Integer.parseInt(curServer.getStatus()) == 1) {
+					curButton.setBackgroundResource(warningImageId);
+				} else if (Integer.parseInt(curServer.getStatus()) == 2) {
+					curButton.setBackgroundResource(criticalImageId);
+				} else {
+					curButton.setBackgroundResource(normalImageId);
+				}
+				
+				Typeface typeface = Typeface.createFromAsset(getAssets(), "swissbt.ttf");
+				curButton.setTextSize(40);
+				   
+				curButton.setText((String) curServer.getName());
+				curButton.setTypeface(typeface);
+				
+				curRow.addView(curButton);
+		        
+				
 		        it.remove(); // avoids a ConcurrentModificationException
+		        curCount++;
+		        //Log.d("TREK", "Here4");
 		    }					
 			
 			if (null != mClient)

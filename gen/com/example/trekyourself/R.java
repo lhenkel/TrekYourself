@@ -39,16 +39,22 @@ containing a value of this type.
         public static final int lcarsfull=0x7f020001;
         public static final int lcarsfull2=0x7f020002;
         public static final int lcarstemplate=0x7f020003;
-        public static final int treklogo1=0x7f020004;
+        public static final int lcarstemplate2=0x7f020004;
+        public static final int servererror=0x7f020005;
+        public static final int servernormal=0x7f020006;
+        public static final int serverwarn=0x7f020007;
+        public static final int treklogo1=0x7f020008;
     }
     public static final class id {
-        public static final int action_settings=0x7f090006;
-        public static final int baseSpace=0x7f090002;
+        public static final int action_settings=0x7f090008;
+        public static final int baseSpace=0x7f090003;
         public static final int container=0x7f090000;
         public static final int gallery1=0x7f090001;
-        public static final int hellothere=0x7f090005;
-        public static final int textViewTrekDate=0x7f090003;
-        public static final int textViewTrekTime=0x7f090004;
+        public static final int hellothere=0x7f090006;
+        public static final int mainViewScreen=0x7f090002;
+        public static final int systemsTable=0x7f090007;
+        public static final int textViewTrekDate=0x7f090004;
+        public static final int textViewTrekTime=0x7f090005;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
