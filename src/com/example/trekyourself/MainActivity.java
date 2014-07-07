@@ -57,6 +57,13 @@ public class MainActivity extends Activity {
 	        updateTime();
 	    }
 	};	
+
+	public Handler mServerStatusHandler = new Handler() {
+	    public void handleMessage(Message msg) {
+	    	new HttpGetTask().execute();
+	    }
+	};	
+	
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +76,7 @@ public class MainActivity extends Activity {
         new HttpGetTask().execute();
         
         ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(5);
-        Runnable periodicTask = new Runnable(){
+        Runnable updateTimeTask = new Runnable(){
             @Override
             public void run() {
                 try{
@@ -81,7 +88,22 @@ public class MainActivity extends Activity {
                 }
             }
         };        
-        ScheduledFuture<?> periodicFuture = sch.scheduleAtFixedRate(periodicTask, 5, 5, TimeUnit.SECONDS);
+        ScheduledFuture<?> periodicFuture = sch.scheduleAtFixedRate(updateTimeTask, 5, 5, TimeUnit.SECONDS);
+        
+        Runnable updateServerTask = new Runnable(){
+            @Override
+            public void run() {
+                try{
+                	mServerStatusHandler.obtainMessage(1).sendToTarget();
+                    Thread.sleep(60 * 1000);
+
+                } catch(Exception e){
+                     
+                }
+            }
+        };        
+        periodicFuture = sch.scheduleAtFixedRate(updateServerTask, 5, 5, TimeUnit.SECONDS);
+        
         //updateTime();
     }
 
@@ -133,6 +155,7 @@ public class MainActivity extends Activity {
 		    int curCount = 0;
 		    int numberOfItems = resServerMap.size();
 		    TableLayout systemsTable = (TableLayout) findViewById(R.id.systemsTable);
+		    systemsTable.removeAllViews();
 	        TableRow curRow = new TableRow(getApplicationContext());
 		    
 		    while (it.hasNext()) {
