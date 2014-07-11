@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:foo="http://schemas.android.com/apk/res/com.example.trekyourself"
+    xmlns:foo="http://schemas.android.com/apk/res/com.henkelsoft.trekyourself"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:id="@+id/mainViewScreen"
@@ -19,7 +19,7 @@
 
        
             
-    <com.example.trekyourself.TextViewTrek
+    <com.henkelsoft.trekyourself.TextViewTrek
         android:id="@+id/textViewTrekDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
         android:layout_marginTop="34px"
         />
                
-    <com.example.trekyourself.TextViewTrek
+    <com.henkelsoft.trekyourself.TextViewTrek
         android:id="@+id/textViewTrekTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

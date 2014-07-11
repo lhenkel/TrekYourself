@@ -1,0 +1,72 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent" 
+    android:layout_marginTop="30dp"
+    android:layout_marginLeft="10dp"
+    >
+
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HTTP Location of Nagios XML:" />
+
+    </TableRow>
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+    
+    <EditText
+        android:id="@+id/httpNagiosLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="40" >
+
+        <requestFocus />
+    </EditText>
+	</TableRow>
+	
+    <TableRow
+        android:id="@+id/tableRow3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Private Calendar Location (http)" />
+	</TableRow>        
+    <TableRow
+        android:id="@+id/tableRow4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        
+        <EditText
+            android:id="@+id/httpCalendarLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="40" />
+
+    </TableRow>
+    <TableRow
+        android:id="@+id/tableRow5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/make_it_so"
+            android:layout_width="0dp"
+           
+            android:layout_weight="10"
+            android:text="Make It So" />
+    
+    </TableRow>
+    
+</TableLayout>
