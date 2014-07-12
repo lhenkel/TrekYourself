@@ -49,7 +49,7 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 		throws ClientProtocolException, IOException {
 		try {
 
-			Log.d("TREK", "Running Here!");
+			Log.d("TREK", "Running Server HTTP Grab!");
 			// Create the Pull Parser
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 			XmlPullParser xpp = factory.newPullParser();
@@ -82,10 +82,10 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 			NodeList nList = doc.getElementsByTagName("host");
 		 
 			for (int temp = 0; temp < nList.getLength(); temp++) {
-				Log.d("TREK", "Running Here! Num=" + Integer.toString(temp));
+				//Log.d("TREK", "Running Here! Num=" + Integer.toString(temp));
 				Node nNode = nList.item(temp);
 		 
-				System.out.println("\nCurrent Element :" + nNode.getNodeName());
+				//System.out.println("\nCurrent Element :" + nNode.getNodeName());
 		 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 		 
@@ -98,8 +98,8 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 					curServer.setServerStatus(curStatus);
 					 
 					//System.out.println("Host Name : " + eElement.getElementsByTagName("host_name").item(0).getTextContent());
-					Log.d("TREK", "Host Name : " + eElement.getElementsByTagName("host_name").item(0).getTextContent());
-					Log.d("TREK", "State : " + eElement.getElementsByTagName("current_state").item(0).getTextContent());
+					//Log.d("TREK", "Host Name : " + eElement.getElementsByTagName("host_name").item(0).getTextContent());
+					//Log.d("TREK", "State : " + eElement.getElementsByTagName("current_state").item(0).getTextContent());
 					
 					//System.out.println("State : " + eElement.getElementsByTagName("current_state").item(0).getTextContent());
 					serverHash.put(serverName, curServer);
@@ -109,14 +109,14 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 
 			nList = doc.getElementsByTagName("service");	// now loop through and see if any services are down
 			 
-			Log.d("TREK", "----------------------------");
+			//Log.d("TREK", "----------------------------");
 			
 			
 		 	for (int temp = 0; temp < nList.getLength(); temp++) {
 		 
 				Node nNode = nList.item(temp);
 		 
-				Log.d("TREK", "Current Element :" + nNode.getNodeName());
+				//Log.d("TREK", "Current Element :" + nNode.getNodeName());
 				//System.out.println("\nCurrent Element :" + nNode.getNodeName());
 		 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -140,8 +140,8 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 						serverHash.put(serverName, curServer);
 					}
 					
-					Log.d("TREK", "Host Name : " + eElement.getElementsByTagName("host_name").item(0).getTextContent());
-					Log.d("TREK", "State : " + eElement.getElementsByTagName("current_state").item(0).getTextContent());
+					//Log.d("TREK", "Host Name : " + eElement.getElementsByTagName("host_name").item(0).getTextContent());
+					//Log.d("TREK", "State : " + eElement.getElementsByTagName("current_state").item(0).getTextContent());
 					//System.out.println("Host Name : " + eElement.getElementsByTagName("host_name").item(0).getTextContent());
 					//System.out.println("State : " + eElement.getElementsByTagName("current_state").item(0).getTextContent());
 					serverHash.put(serverName, curServer);

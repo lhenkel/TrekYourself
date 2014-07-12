@@ -3,13 +3,20 @@ package com.henkelsoft.trekyourself;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.os.Build;
+import android.preference.PreferenceManager;
 
 public class TrekPrefsActivity extends Activity {
 
@@ -49,6 +56,8 @@ public class TrekPrefsActivity extends Activity {
 	 */
 	public static class PlaceholderFragment extends Fragment {
 
+		
+		
 		public PlaceholderFragment() {
 		}
 
@@ -57,6 +66,73 @@ public class TrekPrefsActivity extends Activity {
 				Bundle savedInstanceState) {
 			View rootView = inflater.inflate(
 					R.layout.trek_prefs_layout_fragment, container, false);
+			
+			Button myButton = (Button)rootView.findViewById(R.id.make_it_so);
+			//final SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+			//final SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+			
+			final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+			
+			//String nagiosHttpLocation = sharedPref.getInt(getString(R.string.saved_high_score), defaultValue);			
+			String nagiosHttpLocation = (String) sharedPref.getString("nagiosLocation", null);
+			
+			EditText nagiosLocationTE = (EditText) rootView.findViewById(R.id.httpNagiosLocation);
+			
+			//nagiosLocationTE.setText("testing");
+			
+			if (nagiosHttpLocation != null ) {
+				Log.d("TREK", "Prefs String:" + nagiosHttpLocation);
+				nagiosLocationTE.setText(nagiosHttpLocation);
+				
+			} else {
+				Log.d("TREK", "Prefs String BLANK");
+				nagiosLocationTE.setText("http://");
+			}
+
+			myButton.setOnClickListener(new View.OnClickListener() {
+				  public void onClick(View view) {
+					  
+					  SharedPreferences.Editor editor = sharedPref.edit();
+					  EditText nagiosLocationTextEdit = (EditText) getActivity().findViewById(R.id.httpNagiosLocation);
+					  
+					  editor.putString("nagiosLocation", nagiosLocationTextEdit.getText().toString());
+					  
+					  Log.d("TREK", "Setting nagios locatin to: " + nagiosLocationTextEdit.getText().toString());
+					  
+					  editor.commit();				  
+					  
+				    	Intent backToMain = new Intent(getActivity(), MainActivity.class);
+				    	startActivity(backToMain);    	
+				  
+				  }
+				});									
+			
+/*			Button myButton = (Button)rootView.findViewById(R.id.make_it_so);
+			final SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+			//String nagiosHttpLocation = sharedPref.getInt(getString(R.string.saved_high_score), defaultValue);			
+			String nagiosHttpLocation = sharedPref.getString("nagiosLocation", "");
+			
+			EditText nagiosLocationTE = (EditText) getActivity().findViewById(R.id.httpNagiosLocation);
+			nagiosLocationTE.setText(nagiosHttpLocation);
+
+			myButton.setOnClickListener(new View.OnClickListener() {
+			  public void onClick(View view) {
+				  //finish();
+				// getActivity().getFragmentManager().beginTransaction().remove(view).commit();
+				  //getActivity().getFragmentManager().beginTransaction().remove( (Fragment) getActivity() ).commit();
+				  SharedPreferences.Editor editor = sharedPref.edit();
+				  EditText nagiosLocationTextEdit = (EditText) getActivity().findViewById(R.id.httpNagiosLocation);
+				  editor.putString("nagiosLocation", nagiosLocationTextEdit.getText().toString());
+				  
+				  editor.commit();				  
+				 
+		    	Intent backToMain = new Intent(getActivity(), MainActivity.class);
+		    	startActivity(backToMain);    	
+
+			  }
+			});						
+*/			
+			
 			return rootView;
 		}
 	}

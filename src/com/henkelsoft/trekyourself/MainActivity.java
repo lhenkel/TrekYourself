@@ -3,7 +3,9 @@ package com.henkelsoft.trekyourself;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Message;
@@ -39,6 +41,7 @@ import java.util.concurrent.ScheduledFuture;
 
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 
 import java.util.List;
 
@@ -52,6 +55,7 @@ import com.henkelsoft.trekyourself.R;
 public class MainActivity extends Activity {
 
 	private HashMap<String, MonitoredServer> serverMap;
+	private static String nagiosHttpLocation;
 	
 	private int NUM_SERVER_COLS = 4;
 	
@@ -73,10 +77,21 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.primary_layout);	//textViewTrekDate
-        Log.d("TREK", "State : Here");
+        Log.d("TREK", "State : Running create stuff");
         updateTime();
         
-        new HttpGetTask().execute();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+               
+        //SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+        nagiosHttpLocation = (String) sharedPreferences.getString("nagiosLocation", null);
+        
+        Log.d("TREK", "Possibly doing server get to: " + nagiosHttpLocation);
+        
+    	if (nagiosHttpLocation != null) {
+    		new HttpGetTask().execute();
+    	}
+        //SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+
         
         ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(5);
         Runnable updateTimeTask = new Runnable(){
@@ -96,13 +111,27 @@ public class MainActivity extends Activity {
         Runnable updateServerTask = new Runnable(){
             @Override
             public void run() {
-                try{
-                	mServerStatusHandler.obtainMessage(1).sendToTarget();
-                    Thread.sleep(60 * 1000);
+                
+    			//final SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                            	
+            	//final SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+    			//String nagiosHttpLocation = sharedPref.getInt(getString(R.string.saved_high_score), defaultValue);			
+    			//
+            	SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+                nagiosHttpLocation = (String) sharedPreferences.getString("nagiosLocation", null);
+                
+            	if (nagiosHttpLocation != null) {
+                	try{
+                    	mServerStatusHandler.obtainMessage(1).sendToTarget();
+                        Thread.sleep(60 * 1000);
 
-                } catch(Exception e){
-                     
-                }
+                    } catch(Exception e){
+                         
+                    }
+            		
+            	}
+            	
+
             }
         };        
         periodicFuture = sch.scheduleAtFixedRate(updateServerTask, 5, 5, TimeUnit.SECONDS);
@@ -113,8 +142,13 @@ public class MainActivity extends Activity {
 	private class HttpGetTask extends AsyncTask<Void, Void, HashMap<String, MonitoredServer>> {
 
 		private static final String TAG = "HttpGetTask";
-
-		private static final String URL = "http://63.226.80.152:8080/nagios/status.xml";	
+		
+		//XXX
+		
+		//private static final String URL = "http://63.226.80.152:8080/nagios/status.xml";
+		private final String URL = nagiosHttpLocation;
+		
+			
 
 		AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
 		
