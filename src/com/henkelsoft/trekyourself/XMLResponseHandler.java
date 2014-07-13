@@ -47,9 +47,12 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 	@Override
 	public HashMap<String, MonitoredServer> handleResponse(HttpResponse response)
 		throws ClientProtocolException, IOException {
+		
+		Log.d("TREK", "Running Server HTTP Grab! What Arent this executing2");
+		
 		try {
 
-			Log.d("TREK", "Running Server HTTP Grab!");
+			Log.d("TREK", "Running Server HTTP Grab! What Arent this executing");
 			// Create the Pull Parser
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 			XmlPullParser xpp = factory.newPullParser();

@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
         Log.d("TREK", "State : Running create stuff");
         updateTime();
         
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                
         //SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
         nagiosHttpLocation = (String) sharedPreferences.getString("nagiosLocation", null);
@@ -88,7 +88,7 @@ public class MainActivity extends Activity {
         Log.d("TREK", "Possibly doing server get to: " + nagiosHttpLocation);
         
     	if (nagiosHttpLocation != null) {
-    		new HttpGetTask().execute();
+    		//new HttpGetTask().execute();
     	}
         //SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
@@ -108,6 +108,8 @@ public class MainActivity extends Activity {
         };        
         ScheduledFuture<?> periodicFuture = sch.scheduleAtFixedRate(updateTimeTask, 5, 5, TimeUnit.SECONDS);
         
+        //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        
         Runnable updateServerTask = new Runnable(){
             @Override
             public void run() {
@@ -117,9 +119,16 @@ public class MainActivity extends Activity {
             	//final SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
     			//String nagiosHttpLocation = sharedPref.getInt(getString(R.string.saved_high_score), defaultValue);			
     			//
-            	SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-                nagiosHttpLocation = (String) sharedPreferences.getString("nagiosLocation", null);
-                
+            	//SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
+            	
+            	//SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            	//final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            	//final SharedPreferences tmpPrefs = sharedPreferences; //.getString("nagiosLocation", null);
+
+            	
+            	nagiosHttpLocation = (String) sharedPreferences.getString("nagiosLocation", null);
+            	//nagiosHttpLocation = "http://63.226.80.152:8080/nagios/status.xml";
+            	
             	if (nagiosHttpLocation != null) {
                 	try{
                     	mServerStatusHandler.obtainMessage(1).sendToTarget();
@@ -143,7 +152,7 @@ public class MainActivity extends Activity {
 
 		private static final String TAG = "HttpGetTask";
 		
-		//XXX
+		//
 		
 		//private static final String URL = "http://63.226.80.152:8080/nagios/status.xml";
 		private final String URL = nagiosHttpLocation;
@@ -157,6 +166,7 @@ public class MainActivity extends Activity {
 		protected HashMap<String, MonitoredServer> doInBackground(Void... params) {
 
 			HttpGet request = new HttpGet(URL);
+			Log.d("TREK", "Running Server HTTP Grab! BEFORE!!");
 			XMLResponseHandler responseHandler = new XMLResponseHandler();
 			//HashMap<String, MonitoredServer> myMap = (HashMap<String, MonitoredServer>) responseHandler;
 			
@@ -174,63 +184,82 @@ public class MainActivity extends Activity {
 		@Override
 		protected void onPostExecute( HashMap<String, MonitoredServer> result) {
 			
-			HashMap<String, MonitoredServer> resServerMap = (HashMap<String, MonitoredServer>) result;
-			
-			ImageView image = new ImageView(getApplicationContext());
-			
-			int normalImageId = getResources().getIdentifier("servernormal",  "drawable", getPackageName());
-			int warningImageId = getResources().getIdentifier("serverwarn",  "drawable", getPackageName());
-			int criticalImageId = getResources().getIdentifier("servererror",  "drawable", getPackageName());
-
-			RelativeLayout mainViewScreen = (RelativeLayout) findViewById(R.id.mainViewScreen);
-			
-			TextView text1 = (TextView) findViewById(R.id.hellothere);
-			text1.setText( "Test111" + Integer.toString(resServerMap.size()) );
-		    Iterator it = resServerMap.entrySet().iterator();
-		    MonitoredServer curServer = null;
-	
-		    int curCount = 0;
-		    int numberOfItems = resServerMap.size();
-		    TableLayout systemsTable = (TableLayout) findViewById(R.id.systemsTable);
-		    systemsTable.removeAllViews();
-	        TableRow curRow = new TableRow(getApplicationContext());
-		    
-		    while (it.hasNext()) {
-		    	//Log.d("TREK", "Here3");
-		        Map.Entry pairs = (Map.Entry)it.next();
-
-		        curServer =  (MonitoredServer) pairs.getValue();
-		        //text1.setText(  (String) pairs.getKey() );
-		        
-		        if ((curCount % NUM_SERVER_COLS == 0) ) {
-		        	curRow = new TableRow(getApplicationContext());
-		        	systemsTable.addView(curRow);
-		        }
-
-				Button curButton =  new Button(getApplicationContext());
+			if (result == null) {
+				Log.d("TREK", "result is null.. nuts");
+			} else {
+				HashMap<String, MonitoredServer> resServerMap = (HashMap<String, MonitoredServer>) result;
 				
-				if (Integer.parseInt(curServer.getStatus()) == 1) {
-					curButton.setBackgroundResource(warningImageId);
-				} else if (Integer.parseInt(curServer.getStatus()) == 2) {
-					curButton.setBackgroundResource(criticalImageId);
+				ImageView image = new ImageView(getApplicationContext());
+				
+				int normalImageId = getResources().getIdentifier("servernormal",  "drawable", getPackageName());
+				int warningImageId = getResources().getIdentifier("serverwarn",  "drawable", getPackageName());
+				int criticalImageId = getResources().getIdentifier("servererror",  "drawable", getPackageName());
+
+				RelativeLayout mainViewScreen = (RelativeLayout) findViewById(R.id.mainViewScreen);
+				
+				//TextView text1 = (TextView) findViewById(R.id.hellothere);
+				//text1.setText( "Test111" + Integer.toString(resServerMap.size()) );
+				
+				Log.d("TREK", "size of entry" + resServerMap.size() );
+				
+				if (resServerMap.size() > 0 ) {
+					Iterator it = resServerMap.entrySet().iterator();
+				    MonitoredServer curServer = null;
+			
+				    int curCount = 0;
+				    int numberOfItems = resServerMap.size();
+				    TableLayout systemsTable = (TableLayout) findViewById(R.id.systemsTable);
+				    systemsTable.removeAllViews();
+			        TableRow curRow = new TableRow(getApplicationContext());
+				    
+			        
+			        
+				    while (it.hasNext()) {
+				    	//Log.d("TREK", "Here3");
+				        Map.Entry pairs = (Map.Entry)it.next();
+
+				        curServer =  (MonitoredServer) pairs.getValue();
+				        //text1.setText(  (String) pairs.getKey() );
+				        
+				        if ((curCount % NUM_SERVER_COLS == 0) ) {
+				        	curRow = new TableRow(getApplicationContext());
+				        	systemsTable.addView(curRow);
+				        }
+
+						Button curButton =  new Button(getApplicationContext());
+						
+						if (Integer.parseInt(curServer.getStatus()) == 1) {
+							curButton.setBackgroundResource(warningImageId);
+						} else if (Integer.parseInt(curServer.getStatus()) == 2) {
+							curButton.setBackgroundResource(criticalImageId);
+						} else {
+							curButton.setBackgroundResource(normalImageId);
+						}
+						
+						Typeface typeface = Typeface.createFromAsset(getAssets(), "swissbt.ttf");
+						curButton.setTextSize(40);
+						   
+						curButton.setText((String) curServer.getName());
+						curButton.setTypeface(typeface);
+						
+						curRow.addView(curButton);
+				        
+						
+				        it.remove(); // avoids a ConcurrentModificationException
+				        curCount++;
+				        //Log.d("TREK", "Here4");
+				    }					
+									
+					
+					
 				} else {
-					curButton.setBackgroundResource(normalImageId);
+					Log.d("TREK", "size of entry is 0" + resServerMap.size() );
 				}
-				
-				Typeface typeface = Typeface.createFromAsset(getAssets(), "swissbt.ttf");
-				curButton.setTextSize(40);
-				   
-				curButton.setText((String) curServer.getName());
-				curButton.setTypeface(typeface);
-				
-				curRow.addView(curButton);
-		        
-				
-		        it.remove(); // avoids a ConcurrentModificationException
-		        curCount++;
-		        //Log.d("TREK", "Here4");
-		    }					
+								
+			}
 			
+
+
 			if (null != mClient)
 				mClient.close();
 			//setListAdapter(new ArrayAdapter<String>(
