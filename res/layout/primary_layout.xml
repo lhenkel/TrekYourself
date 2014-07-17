@@ -8,7 +8,7 @@
     android:minWidth="180dip"
     android:minHeight="100dip"
     android:keepScreenOn="true"
-    android:background="@drawable/lcarstemplate2"     >
+    android:background="@drawable/lcarstemplate3"     >
  
 
             <Space
@@ -46,31 +46,105 @@
         
         />
 
-    <TextView
-        android:id="@+id/hellothere"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textViewTrekDate"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="96dp"
-        android:text="TextView"
-        android:textColor="@color/opaque_red" />
     
     <TableLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/baseSpace"
-        
         android:id="@+id/systemsTable"
         android:layout_marginLeft="240dp"
         android:layout_marginTop="120dp"
         android:shrinkColumns="*"
-        
         android:orientation="vertical"        
-         >
-
-
+    >
     </TableLayout>     
 
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/baseSpace"
+        android:id="@+id/calendarTable"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="427dp"
+        android:shrinkColumns="*"
+        android:orientation="vertical"        
+    >
+<TableRow
+        android:id="@+id/tableRow133"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="1dip" >
+<com.henkelsoft.trekyourself.TextViewTrek
+            android:id="@+id/textView122"
+            android:text="Upcoming Meetings"
+            
+        android:textColor="@color/h2"
+        android:textSize="30sp" 
+        foo:customFont="swissbt.ttf"
+/>
+
+</TableRow>   
+<TableRow
+        android:id="@+id/tableRow133"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="1dip" >
+
+<com.henkelsoft.trekyourself.TextViewTrek
+            android:id="@+id/textView124"
+            android:text="Today"
+        android:textColor="@color/h3"
+        android:textSize="30sp" 
+        foo:customFont="swissbt.ttf"
+         />
+</TableRow>
+<TableRow
+        android:id="@+id/tableRow133"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="1dip" >
+
+<com.henkelsoft.trekyourself.TextViewTrek
+            android:id="@+id/textViewToday"
+            android:text="Clear"
+        android:textColor="@color/plain_text"
+        android:textSize="30sp" 
+        foo:customFont="swissbt.ttf"
+             />
+</TableRow>
+
+<TableRow
+        android:id="@+id/tableRow133"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="1dip" >
+
+
+<com.henkelsoft.trekyourself.TextViewTrek
+            android:id="@+id/textView125"
+            android:text="Tomorrow"
+        android:textColor="@color/h3"
+        android:textSize="30sp" 
+        foo:customFont="swissbt.ttf"
+         />
+</TableRow>
+
+<TableRow
+        android:id="@+id/tableRow133"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="1dip" >
+
+<com.henkelsoft.trekyourself.TextViewTrek
+            android:id="@+id/textViewTomorrow"
+            android:text="Clear"
+        android:textColor="@color/plain_text"
+        android:textSize="30sp" 
+        foo:customFont="swissbt.ttf"
+             />
+</TableRow>         
+    </TableLayout>       
+    
+    
 
 </RelativeLayout>

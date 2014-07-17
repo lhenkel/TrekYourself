@@ -2,5 +2,9 @@
 <resources>
    <color name="opaque_red">#f00</color>
    <color name="header_col">#fff</color>
+   <color name="plain_text">#fff</color>
+   <color name="h2">#cc6698</color>
+   <color name="h3">#ffcc9a</color>
+   
    <color name="translucent_red">#80ff0000</color>
 </resources>

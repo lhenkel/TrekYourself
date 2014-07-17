@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="facts">  
+        <item>Signs of heatstroke: Red, hot, and dry skin, Throbbing headache, Rapid heartbeat, Rapid, shallow breathing</item>  
+        <item>Signs of exhaustion: Confusion, Muscle cramps, Nausea, Fatigue</item>  
+        <item>Signs Stroke SUDDEN numbness, weakness of face, arm or leg (esp one side) trouble seeing one/both eyes, severe headache</item>  
+        <item>Heart Attack: pressure in the center of your chest. Pain in one/both arms; cold sweat, nausea or lightheadedness. </item>  
+        <item>US Foreign Aid: $48.4 billion -military = $17.2billion  economic assistance: $31.2 billion</item>  
+		<item>What do you get if you mix human DNA with a goat? Banned from the petting zoo.</item>  
+		<item>Why don\'t blind people skydive? It scares the hell out of the dog.</item>  
+		<item>Q. Why are pirates pirates? Because they Arrrrrrrrrrrrrr</item>  
+		<item>Q: How do you catch a squirrel?  Climb up a tree and act like a nut. </item>  
+		<item>What did the farmer say when he lost his tractor?  Where\'s my tractor?</item>  
+   </string-array>    
+</resources>

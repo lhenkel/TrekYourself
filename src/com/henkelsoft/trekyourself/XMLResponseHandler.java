@@ -36,8 +36,6 @@ import java.util.Map;
 
 import android.util.Log;
 
-
-
 public class XMLResponseHandler implements ResponseHandler<HashMap<String, MonitoredServer>> {
 
 	private final List<String> mResults = new ArrayList<String>();
@@ -69,11 +67,6 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); //**<--What class is this?**
 		    Document doc = builder.parse(in); //if we step through to here, this line executes then goes directly to "x" below
 
-//			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			
-	//		Document doc = dBuilder.parse(new InputStreamReader(response.getEntity()
-		//			.getContent()).toString());
-			 
 			//optional, but recommended
 			//read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
 			doc.getDocumentElement().normalize();
@@ -100,11 +93,9 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 					curServer.setServerName(serverName);
 					curServer.setServerStatus(curStatus);
 					 
-					//System.out.println("Host Name : " + eElement.getElementsByTagName("host_name").item(0).getTextContent());
 					//Log.d("TREK", "Host Name : " + eElement.getElementsByTagName("host_name").item(0).getTextContent());
 					//Log.d("TREK", "State : " + eElement.getElementsByTagName("current_state").item(0).getTextContent());
 					
-					//System.out.println("State : " + eElement.getElementsByTagName("current_state").item(0).getTextContent());
 					serverHash.put(serverName, curServer);
 		 
 				}
@@ -112,22 +103,15 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 
 			nList = doc.getElementsByTagName("service");	// now loop through and see if any services are down
 			 
-			//Log.d("TREK", "----------------------------");
-			
-			
 		 	for (int temp = 0; temp < nList.getLength(); temp++) {
 		 
 				Node nNode = nList.item(temp);
-		 
-				//Log.d("TREK", "Current Element :" + nNode.getNodeName());
-				//System.out.println("\nCurrent Element :" + nNode.getNodeName());
-		 
+	 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 		 
 					Element eElement = (Element) nNode;
 					
 					String serverName = eElement.getElementsByTagName("host_name").item(0).getTextContent();
-					//int foo = Integer.parseInt("1234");
 					String curServiceStatusStr = eElement.getElementsByTagName("current_state").item(0).getTextContent();
 					int curServiceStatus  = Integer.parseInt(curServiceStatusStr);
 					String curService  = eElement.getElementsByTagName("service_description").item(0).getTextContent();
@@ -143,10 +127,6 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 						serverHash.put(serverName, curServer);
 					}
 					
-					//Log.d("TREK", "Host Name : " + eElement.getElementsByTagName("host_name").item(0).getTextContent());
-					//Log.d("TREK", "State : " + eElement.getElementsByTagName("current_state").item(0).getTextContent());
-					//System.out.println("Host Name : " + eElement.getElementsByTagName("host_name").item(0).getTextContent());
-					//System.out.println("State : " + eElement.getElementsByTagName("current_state").item(0).getTextContent());
 					serverHash.put(serverName, curServer);
 		 
 				}
@@ -157,20 +137,7 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 	 		
 	    	e.printStackTrace();
 	    }
-		 
-	    /*Iterator it = serverHash.entrySet().iterator();
-	    MonitoredServer curServer = null;
-	    while (it.hasNext()) {
-	        Map.Entry pairs = (Map.Entry)it.next();
-	        //System.out.println(pairs.getKey() + " = " + pairs.getValue());
-	        curServer =  (MonitoredServer) pairs.getValue();
-	        //System.out.println(pairs.getKey());
-	        Log.d("TREK", (String) pairs.getKey());
-	        //System.out.println(curServer.getStatus());
-	        Log.d("TREK", (String) curServer.getStatus());
-	        it.remove(); // avoids a ConcurrentModificationException
-	    }		*/ 
-	    
+    
 	    return serverHash;
 	}	
 	

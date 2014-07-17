@@ -75,10 +75,10 @@ public class TrekPrefsActivity extends Activity {
 			
 			//String nagiosHttpLocation = sharedPref.getInt(getString(R.string.saved_high_score), defaultValue);			
 			String nagiosHttpLocation = (String) sharedPref.getString("nagiosLocation", null);
+			String httpCalendarLocation = (String) sharedPref.getString("httpCalendarLocation", null);
 			
 			EditText nagiosLocationTE = (EditText) rootView.findViewById(R.id.httpNagiosLocation);
-			
-			//nagiosLocationTE.setText("testing");
+			EditText httpCalendarLocationTE2 = (EditText) rootView.findViewById(R.id.httpCalendarLocation);
 			
 			if (nagiosHttpLocation != null ) {
 				Log.d("TREK", "Prefs String:" + nagiosHttpLocation);
@@ -89,13 +89,22 @@ public class TrekPrefsActivity extends Activity {
 				nagiosLocationTE.setText("http://");
 			}
 
+			//httpCalendarLocationTE2.setText("http://");
+			if (httpCalendarLocation != null ) {
+				httpCalendarLocationTE2.setText(httpCalendarLocation);
+			} else {
+				httpCalendarLocationTE2.setText("http://");
+			}
+			
 			myButton.setOnClickListener(new View.OnClickListener() {
 				  public void onClick(View view) {
 					  
 					  SharedPreferences.Editor editor = sharedPref.edit();
 					  EditText nagiosLocationTextEdit = (EditText) getActivity().findViewById(R.id.httpNagiosLocation);
+					  EditText httpCalendarLocationTextEdit = (EditText) getActivity().findViewById(R.id.httpCalendarLocation);
 					  
 					  editor.putString("nagiosLocation", nagiosLocationTextEdit.getText().toString());
+					  editor.putString("httpCalendarLocation", httpCalendarLocationTextEdit.getText().toString());
 					  
 					  Log.d("TREK", "Setting nagios locatin to: " + nagiosLocationTextEdit.getText().toString());
 					  
@@ -103,7 +112,7 @@ public class TrekPrefsActivity extends Activity {
 					  
 				    	Intent backToMain = new Intent(getActivity(), MainActivity.class);
 				    	startActivity(backToMain);    	
-				  
+				    	getActivity().finish();
 				  }
 				});									
 			
