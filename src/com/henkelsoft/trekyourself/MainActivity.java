@@ -30,6 +30,8 @@ import java.util.Calendar;
 
 
 
+
+
 import org.apache.http.HttpResponse;
 
 import java.util.Date;
@@ -37,6 +39,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -130,6 +133,8 @@ public class MainActivity extends Activity {
     	    	
         //SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
+    	updateAcademyFiles();
+    	
         
         ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(5);
         Runnable updateTimeTask = new Runnable(){
@@ -185,6 +190,16 @@ public class MainActivity extends Activity {
         
         //updateTime();
     }
+
+	private void updateAcademyFiles() {
+		//getContext();
+		//String[] array = context.getResources().getStringArray(R.array.facts);
+		String[] array = getResources().getStringArray(R.array.facts);
+		String randomFact = array[new Random().nextInt(array.length)];
+		//academyRandomFact
+		TextViewTrek tvRandomFact = (TextViewTrek) findViewById(R.id.academyRandomFact);
+		tvRandomFact.setText(randomFact);
+	}
 
 	private class HttpGetTask extends AsyncTask<Void, Void, HashMap<String, MonitoredServer>> {
 
@@ -307,7 +322,8 @@ public class MainActivity extends Activity {
 
 	private class CalHttpGetTask extends AsyncTask<Void, Void, TreeMap<Date, String>> {
 
-		private final String URL = calHttpLocation.concat(endParams);
+		//private final String URL = calHttpLocation.concat(endParams);
+		private final String URL = "http://63.226.80.152:8080/nagios/curCal.xml";
 		
 		AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
 		
@@ -389,9 +405,14 @@ public class MainActivity extends Activity {
 	
 		    int curCount = 0;
 		    int numberOfItems = calHash.size();
-		    TextViewTrek tvToday = (TextViewTrek) findViewById(R.id.textViewToday);
-		    tvToday.setText("testing123");
 		    
+		    SimpleDateFormat calformat = new SimpleDateFormat("HH:mm");
+		    
+		    String tvTodayStr = "";
+		    String tommStr = "";
+		    int maxCalDisplayCount = 4;
+		    int todayCount = 0;
+		    int tommCount = 0;
 		    while (it.hasNext()) {
 
 		        Map.Entry pairs = (Map.Entry)it.next();
@@ -400,26 +421,56 @@ public class MainActivity extends Activity {
 		        boolean updatedNextMeeting = false;
 		        
 		        Date calDate = (Date) pairs.getKey(); 
-		    	if (googleMinMaxForamt.format(calDate).toString().equals( googleMinMaxForamt.format(curDate).toString()  ))  {
+		    	
+		        
+		        
+		        if (googleMinMaxForamt.format(calDate).toString().equals( googleMinMaxForamt.format(curDate).toString()  ))  {
 		    		Log.d("TREK", "State : Date is Today!");
 		    		if (calDate.compareTo( curDate) > 0) {	// still in the future; don't care about old
-		    			todayMap.put(calDate, eventName);
+		    		//if (1 == 1) {	// still in the future; don't care about old
+//		    			todayMap.put(calDate, eventName);
 		    			if (updatedNextMeeting == false) {
 		    				updateNextMeetingTime(calDate);
 		    				updatedNextMeeting = true;
 		    			}
+		    			
+		    			if (todayCount < maxCalDisplayCount) {
+			    	
+		    				if (todayCount > 0) {
+			    				tvTodayStr = tvTodayStr + "\n";
+			    			}
+
+			    			tvTodayStr = tvTodayStr + calformat.format(calDate) + " " + eventName ;
+			    			todayCount++;
+
+		    			}
+		    		
 		    		}
+		    		
 		    		
 		    	} 
 		        
+		        
 		    	if (googleMinMaxForamt.format(calDate).toString().equals( googleMinMaxForamt.format(tomDate).toString()  ))  {
-		    		Log.d("TREK", "State : Date is tomrrow!");
-		    		tommorrowMap.put(calDate, eventName);
+		    		Log.d("TREK", "State : Date is tomrrow!!!");
+
 	    			if (updatedNextMeeting == false) {
+	    				Log.d("TREKDATE", "Updateing next meeting ...");
 	    				updateNextMeetingTime(calDate);
 	    				updatedNextMeeting = true;
 	    			}
-		    		
+	    			if (todayCount + tommCount < maxCalDisplayCount) {
+				    	
+	    				if (tommCount > 0) {
+	    					tommStr = tommStr + "\n";
+		    			}
+
+	    				tommStr = tommStr + calformat.format(calDate) + " " + eventName ;
+		    			tommCount++;
+
+	    			}
+
+	    			
 		    	} 
 		        
 		        //tvToday.setText(eventName);
@@ -429,7 +480,19 @@ public class MainActivity extends Activity {
 		    }					
 			
 
+		    TextViewTrek tvToday = (TextViewTrek) findViewById(R.id.textViewToday);
+		    if (tvTodayStr.length() > 0) {
+			    tvToday.setText(tvTodayStr);
+		    } else {
+		    	tvToday.setText("Clear");
+		    }
 		    
+		    TextViewTrek tvTomm = (TextViewTrek) findViewById(R.id.textViewTomorrow);
+		    if (tommStr.length() > 0) {
+			    tvTomm.setText(tommStr);
+		    } else {
+		    	tvTomm.setText("Clear");
+		    }
 		    
 		} else {
 			Log.d("TREK", "size of entry is 0" + calHash.size() );
@@ -439,8 +502,36 @@ public class MainActivity extends Activity {
     
     
     private void updateNextMeetingTime(Date calDate) {
-		// TODO Auto-generated method stub
+
+    	RelativeLayout mainViewScreen = (RelativeLayout) findViewById(R.id.mainViewScreen);
+    	
+		long dtMili = System.currentTimeMillis();
+		Date curDate = new Date(dtMili);
+    	
+    	long diff = calDate.getTime() - curDate.getTime()  + (60 * 60 * 1000 * 4);
+		int diffDays = (int) (diff / (24 * 60 * 60 * 1000));
+		diff = diff - (long) diffDays * (24 * 60 * 60 * 1000);
+		int diffHours = (int) (diff / (60 * 60 * 1000));
+		diff = diff - (long) diffHours * (60 * 60 * 1000);
 		
+		int diffMins = (int) (diff / (60 * 1000));
+		
+		String timeToNextStr = "";
+		if (diffDays > 0) {
+			timeToNextStr = timeToNextStr +  Integer.toString(diffDays) + " Days ";
+		}
+		if (diffHours > 0) {
+			timeToNextStr = timeToNextStr +  Integer.toString(diffHours) + " Hrs ";
+		}
+		if (diffMins > 0) {
+			timeToNextStr = timeToNextStr +  Integer.toString(diffMins) + " Min";
+		}
+
+	    //TextViewTrek tvNextMeeting = (TextViewTrek) findViewById(R.id.textViewTrekDate);
+		TextViewTrek tvNextMeeting = (TextViewTrek) findViewById(R.id.textViewNextMeeting);
+	    tvNextMeeting.setText(timeToNextStr);
+	    //tvNextMeeting.setText("blej");
+	    Log.d("TREKDATE", "Writing: " + timeToNextStr );
 	}
 
 	@Override

@@ -146,5 +146,69 @@
     </TableLayout>       
     
     
+    <!-- Time To Next Meeting   -->
+    <com.henkelsoft.trekyourself.TextViewTrek
+        android:id="@+id/textViewNextMeeting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear" 
+        android:textColor="@color/plain_text"
+        android:textSize="30sp" 
+        foo:customFont="swissbt.ttf"
+        android:layout_below="@id/baseSpace"
+        android:layout_marginLeft="750px"
+        android:layout_marginTop="990px"
+        />
+        
+    
+    <!--  Academy Facts -->
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/baseSpace"
+        android:id="@+id/academyTable"
+        android:layout_marginLeft="1070px"
+        android:layout_marginTop="645px"
+        android:shrinkColumns="*"
+        android:orientation="vertical"        
+    >
+<TableRow
+        android:id="@+id/tableRow1334"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="1dip" >    
+<com.henkelsoft.trekyourself.TextViewTrek
+        android:id="@+id/academyFactTitle"
+        android:text="Academy Files"
+        android:layout_below="@id/baseSpace"    
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/h2"
+        android:textSize="31sp" 
+        foo:customFont="swissbt.ttf"
+ />
+</TableRow>
+<TableRow
+        android:id="@+id/tableRow1334"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="1dip" >    
+
+<com.henkelsoft.trekyourself.TextViewTrek
+        android:id="@+id/academyRandomFact"
+        android:text=""
+        android:scrollHorizontally="false"
+		android:maxWidth="240dip"
+        android:layout_below="@id/baseSpace"    
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/plain_text"
+        android:textSize="26sp" 
+        foo:customFont="swissbt.ttf"
+ />    
+    
+    
+</TableRow>    
+</TableLayout>
 
 </RelativeLayout>
