@@ -201,6 +201,7 @@ public class MainActivity extends Activity {
 		tvRandomFact.setText(randomFact);
 	}
 
+	
 	private class HttpGetTask extends AsyncTask<Void, Void, HashMap<String, MonitoredServer>> {
 
 		private static final String TAG = "HttpGetTask";
