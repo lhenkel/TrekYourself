@@ -76,9 +76,11 @@ public class TrekPrefsActivity extends Activity {
 			//String nagiosHttpLocation = sharedPref.getInt(getString(R.string.saved_high_score), defaultValue);			
 			String nagiosHttpLocation = (String) sharedPref.getString("nagiosLocation", null);
 			String httpCalendarLocation = (String) sharedPref.getString("httpCalendarLocation", null);
+			String httpSoundLocation = (String) sharedPref.getString("httpSoundLocation", null);
 			
 			EditText nagiosLocationTE = (EditText) rootView.findViewById(R.id.httpNagiosLocation);
 			EditText httpCalendarLocationTE2 = (EditText) rootView.findViewById(R.id.httpCalendarLocation);
+			EditText httpSoundLocationTE = (EditText) rootView.findViewById(R.id.httpSoundLocation);
 			
 			if (nagiosHttpLocation != null ) {
 				Log.d("TREK", "Prefs String:" + nagiosHttpLocation);
@@ -95,16 +97,27 @@ public class TrekPrefsActivity extends Activity {
 			} else {
 				httpCalendarLocationTE2.setText("http://");
 			}
+
+			//httpCalendarLocationTE2.setText("http://");
+			if (httpSoundLocation != null ) {
+				httpSoundLocationTE.setText(httpSoundLocation);
+			} else {
+				httpSoundLocationTE.setText("http://");
+			}
+						
 			
 			myButton.setOnClickListener(new View.OnClickListener() {
 				  public void onClick(View view) {
 					  
 					  SharedPreferences.Editor editor = sharedPref.edit();
+					  
 					  EditText nagiosLocationTextEdit = (EditText) getActivity().findViewById(R.id.httpNagiosLocation);
 					  EditText httpCalendarLocationTextEdit = (EditText) getActivity().findViewById(R.id.httpCalendarLocation);
+					  EditText httpSoundLocationTextEdit = (EditText) getActivity().findViewById(R.id.httpSoundLocation);
 					  
 					  editor.putString("nagiosLocation", nagiosLocationTextEdit.getText().toString());
 					  editor.putString("httpCalendarLocation", httpCalendarLocationTextEdit.getText().toString());
+					  editor.putString("httpSoundLocation", httpSoundLocationTextEdit.getText().toString());
 					  
 					  Log.d("TREK", "Setting nagios locatin to: " + nagiosLocationTextEdit.getText().toString());
 					  

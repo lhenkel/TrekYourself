@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Message;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,10 +23,22 @@ import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.os.Build;
 import android.util.Log;
 
 import java.util.Calendar;
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -64,11 +77,20 @@ import com.henkelsoft.trekyourself.R;
 
 public class MainActivity extends Activity {
 
+	
+	protected static final int REFRESH = 0;
+
+	private Handler _hRedraw;
+	
 	private HashMap<String, MonitoredServer> serverMap;
 	public TreeMap<Date, String> calHash;
-	
+	public HashMap<String, Integer> soundHash;
+	public List<Map<String, String>> taskList;
 	private static String nagiosHttpLocation;
 	private static String calHttpLocation;
+	private static String soundHttpLocation;
+	
+	private SoundMeter mSensor;
 	//public static String endParams = "";
 	
 	static SimpleDateFormat googleMinMaxForamt = new SimpleDateFormat("yyyy-MM-dd");
@@ -92,6 +114,13 @@ public class MainActivity extends Activity {
 	    }
 	};	
 
+	public Handler mSoundHandler = new Handler() {
+	    public void handleMessage(Message msg) {
+	        new SoundHttpGetTask().execute();		
+	    }
+	};	
+	
+	
 	public Handler mServerStatusHandler = new Handler() {
 	    public void handleMessage(Message msg) {
 	    	new HttpGetTask().execute();
@@ -106,12 +135,35 @@ public class MainActivity extends Activity {
         setContentView(R.layout.primary_layout);	//textViewTrekDate
         Log.d("TREK", "State : Running create stuff");
         updateTime();
+
+        _hRedraw=new Handler(){
+            @Override
+            public void handleMessage(Message msg)
+            {
+                switch (msg.what) {
+                case REFRESH:
+                    redrawEverything();
+                    break;
+                }
+            }
+
+			private void redrawEverything() {
+				TableLayout systemsTable = (TableLayout) findViewById(R.id.systemsTable);
+				systemsTable.invalidate();
+				systemsTable.refreshDrawableState();
+				
+			}
+        };
         
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                
+        mSensor = new SoundMeter();
+        
         //SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
         nagiosHttpLocation = (String) sharedPreferences.getString("nagiosLocation", null);
         calHttpLocation = (String) sharedPreferences.getString("httpCalendarLocation", null);
+        soundHttpLocation = (String) sharedPreferences.getString("httpSoundLocation", null);
+        
         //endParams = "sdf";
         Log.d("TREK", "Possibly doing server get to: " + nagiosHttpLocation);
         
@@ -120,21 +172,32 @@ public class MainActivity extends Activity {
 /*    	if (nagiosHttpLocation != null) {
     		new HttpGetTask().execute();
     	}*/
-    	
+
+    	if (soundHttpLocation != null) {
+    		Log.d("TREK", "Possibly Executing Sound Task");
+    		new SoundHttpGetTask().execute();
+    		
+    		
+    	} else {
+    		Log.d("TREK", "Sound HTTP is nul..");
+    	}
+        
+        
     	if (calHttpLocation != null) {
-    		Log.d("TREK", "Possibly Executing CalHTTP Task");
+    		Log.d("TREKDATE", "Possibly Executing CalHTTP Task (not null)");
     		new CalHttpGetTask().execute();
     		
     		
     	} else {
-    		Log.d("TREK", "Cal HTTP is nul..");
+    		Log.d("TREKDATE", "Cal HTTP is nul..");
     	}
 
+		Log.d("TREKTASk", "Possibly Executing Sound Task");
+		new TaskHttpGetTask().execute();
     	    	
         //SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
     	updateAcademyFiles();
-    	
         
         ScheduledThreadPoolExecutor sch = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(5);
         Runnable updateTimeTask = new Runnable(){
@@ -150,29 +213,59 @@ public class MainActivity extends Activity {
             }
         };        
         ScheduledFuture<?> periodicFuture = sch.scheduleAtFixedRate(updateTimeTask, 5, 5, TimeUnit.SECONDS);
+
+
+        Runnable updateCalendarTask = new Runnable(){
+            @Override
+            public void run() {
+                try{
+                	updateCalendar();
+                    Thread.sleep(30 * 1000);
+
+                } catch(Exception e){
+                     
+                }
+            }
+        };        
+        periodicFuture = sch.scheduleAtFixedRate(updateCalendarTask, 30, 45, TimeUnit.SECONDS);
         
-        //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        
+        
+        
+// Check sound data
+/*    Runnable mPollSoundTask = new Runnable() {
+            public void run() {
+            	Log.d("TREKSENSOR", "Logging Sensor. HERE ");
+            	mSensor.start();
+            	
+            	try {
+					Thread.sleep(1000,0);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	double amp = mSensor.getAmplitude();
+            	Log.d("TREKSENSOR", "Logging Sensor. Got " + String.valueOf(amp));
+            	mSensor.stop();
+            	//TextViewTrek tvDebugSound = (TextViewTrek) findViewById(R.id.debugSoundLevel);
+            	//tvDebugSound.setText( String.valueOf(amp));
+
+            }
+    };        
+*/
+    //periodicFuture = sch.scheduleAtFixedRate(mPollSoundTask, 3, 5, TimeUnit.SECONDS);
+
+    //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         
         Runnable updateServerTask = new Runnable(){
             @Override
             public void run() {
                 
-    			//final SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                            	
-            	//final SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-    			//String nagiosHttpLocation = sharedPref.getInt(getString(R.string.saved_high_score), defaultValue);			
-    			//
-            	//SharedPreferences sharedPreferences = getPreferences(MODE_PRIVATE);
-            	
-            	//SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            	//final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            	//final SharedPreferences tmpPrefs = sharedPreferences; //.getString("nagiosLocation", null);
-
-            	
             	nagiosHttpLocation = (String) sharedPreferences.getString("nagiosLocation", null);
             	//nagiosHttpLocation = "http://63.226.80.152:8080/nagios/status.xml";
             	
             	if (nagiosHttpLocation != null) {
+            		Log.d("TREKNAG", "String isnt null");
                 	try{
                     	mServerStatusHandler.obtainMessage(1).sendToTarget();
                         Thread.sleep(60 * 1000);
@@ -181,14 +274,52 @@ public class MainActivity extends Activity {
                          
                     }
             		
+            	} else {
+            		Log.d("TREKNAG", "String IS null");
             	}
             	
 
             }
         };        
-        periodicFuture = sch.scheduleAtFixedRate(updateServerTask, 5, 5, TimeUnit.SECONDS);
+        //periodicFuture = sch.scheduleAtFixedRate(updateServerTask, 25, 25, TimeUnit.SECONDS);
+        periodicFuture = sch.scheduleAtFixedRate(updateServerTask, 5, 10, TimeUnit.SECONDS);
         
-        //updateTime();
+        //
+        
+        Runnable updateSoundTask = new Runnable(){
+            @Override
+            public void run() {
+            	Log.d("TREKSOUND", "Doing Scheduled Sound Update Runnable");                
+            	// TODO : make this variable... came up nul land was lazy..
+            	soundHttpLocation = "http://63.226.80.152:8080/nagios/soundlevel.xml";
+            	
+            	//nagiosHttpLocation = "http://63.226.80.152:8080/nagios/status.xml";
+            	
+            	if (soundHttpLocation != null) {
+            		
+            		Log.d("TREKSOUND", "Doing Scheduled Sound Update Runnable - Not Null");
+            		
+                	try{
+                		//XXX Here
+                		//mSoundHandler.obtainMessage(1).sendToTarget();
+                		new SoundHttpGetTask().execute();
+                        Thread.sleep(6 * 1000);
+
+                    } catch(Exception e){
+                         
+                    }
+            		
+            	} else {
+            		Log.d("TREKSOUND", "Doing Scheduled Sound Update Runnable -IS Null location.. crap..");
+            	}
+            	
+
+            }
+        };        
+        periodicFuture = sch.scheduleAtFixedRate(updateSoundTask, 30, 30, TimeUnit.SECONDS);
+
+        
+        
     }
 
 	private void updateAcademyFiles() {
@@ -254,22 +385,58 @@ public class MainActivity extends Activity {
 				//TextView text1 = (TextView) findViewById(R.id.hellothere);
 				//text1.setText( "Test111" + Integer.toString(resServerMap.size()) );
 				
-				Log.d("TREK", "size of entry" + resServerMap.size() );
+				Log.d("TREK", "size of entry (on post execute)" + resServerMap.size() );
 				
 				if (resServerMap.size() > 0 ) {
-					Iterator it = resServerMap.entrySet().iterator();
+					
+					//XX Make copy here
+					HashMap<String, MonitoredServer> resServerCopy = new HashMap<String, MonitoredServer>(resServerMap);
+					Iterator it = resServerCopy.entrySet().iterator();
 				    MonitoredServer curServer = null;
 			
 				    int curCount = 0;
 				    int numberOfItems = resServerMap.size();
 				    TableLayout systemsTable = (TableLayout) findViewById(R.id.systemsTable);
+				    
+				    TableLayout systemsDynamicTable =  new TableLayout(getApplicationContext());
+				    systemsDynamicTable.setLayoutParams(new TableRow.LayoutParams(
+				    			TableRow.LayoutParams.WRAP_CONTENT));
+				    systemsDynamicTable.setStretchAllColumns(true);
+					RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+					        ViewGroup.LayoutParams.WRAP_CONTENT);
+					
+					p.addRule(RelativeLayout.BELOW, R.id.baseSpace);
+					int left = 370;
+					int top = 170;
+					int right = 380;
+					int bottom = 0;
+					systemsDynamicTable.setPadding(left, top, right, bottom);
+					
+				    
 				    systemsTable.removeAllViews();
-			        TableRow curRow = new TableRow(getApplicationContext());
+				    
+				    _hRedraw.sendEmptyMessage(REFRESH);
+				    
+				    //systemsTable = (TableLayout) findViewById(R.id.systemsTable);		//XXX
+
+				    mainViewScreen.addView(systemsDynamicTable);
+				    //systemsDynamicTable.setWeightSum((float) 0.5);
+				    //systemsDynamicTable.setWeightSum((float) 0.0);
+				    systemsTable = systemsDynamicTable;
+				    
+/*				    int rowCount = systemsTable.getChildCount();
+				    for (int i = 0; i < rowCount; i++) {
+				        View child = systemsTable.getChildAt(i);
+				        if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
+				    }				    
+				    //systemsTable.set
+*/			        
+				    TableRow curRow = new TableRow(getApplicationContext());
 				    
 			        
 			        
 				    while (it.hasNext()) {
-				    	//Log.d("TREK", "Here3");
+				    	Log.d("TREK", "Iterating over Servers!!");
 				        Map.Entry pairs = (Map.Entry)it.next();
 
 				        curServer =  (MonitoredServer) pairs.getValue();
@@ -292,19 +459,42 @@ public class MainActivity extends Activity {
 						
 						Typeface typeface = Typeface.createFromAsset(getAssets(), "swissbt.ttf");
 						curButton.setTextSize(40);
-						   
-						curButton.setText((String) curServer.getName());
+
+						final String serverName = (String) curServer.getName();
+						curButton.setId(123);
+						//curButton.setId(serverName);
+						curButton.setText(serverName);
 						curButton.setTypeface(typeface);
 						
+						final int buttonID = curButton.getId();
+						final HashMap<String,Object> sendMap = curServer.getStatusMap();
+						
 						curRow.addView(curButton);
-				        
+						Log.d("TREK", "Adding Button!!!");
+						curButton.setOnClickListener(new View.OnClickListener() {
+					        public void onClick(View view) {
+
+					        	Intent intent = new Intent(MainActivity.this, ServerDetail.class);
+					        	Bundle b = new Bundle();
+					        	b.putString("servername", serverName); 
+					        	
+					        	b.putSerializable("services", sendMap);
+					        	//b.put
+					        	intent.putExtras(b); //Put your id to your next Intent
+					        	startActivity(intent);
+					        	//finish();					        	
+					        	/*Toast.makeText(view.getContext(),
+					                    "Button clicked index = " + serverName, Toast.LENGTH_SHORT)
+					                    .show();
+					                    	*/
+					        }
+					    });				        
 						
 				        it.remove(); // avoids a ConcurrentModificationException
 				        curCount++;
 				        //Log.d("TREK", "Here4");
 				    }					
 									
-					
 					
 				} else {
 					Log.d("TREK", "size of entry is 0" + resServerMap.size() );
@@ -358,7 +548,60 @@ public class MainActivity extends Activity {
 				Log.d("TREK", "Got to onpost execute (Calendar)!");
 				TreeMap<Date, String> resCalMap = (TreeMap<Date, String>) result;
 				calHash = resCalMap;
+				Log.d("TREK", "size of cal entry right after update " + calHash.size() );
 				updateCalendar();				
+				
+			}
+			
+
+			if (null != mClient)
+				mClient.close();
+			//setListAdapter(new ArrayAdapter<String>(
+			//		NetworkingAndroidHttpClientXMLActivity.this,
+			//		R.layout.list_item, result));
+		}
+
+	}	
+	
+
+	private class SoundHttpGetTask extends AsyncTask<Void, Void, HashMap<String, Integer>> {
+
+		//private final String URL = calHttpLocation.concat(endParams);
+		private final String URL = "http://63.226.80.152:8080/nagios/soundlevel.xml";
+		
+		AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
+		
+		
+		@Override
+		protected HashMap<String, Integer> doInBackground(Void... params) {
+
+			Log.d("CURDEBUG", "Running Sound HTTP Grab! BEFORE!!" + URL);
+			
+			HttpGet request = new HttpGet(URL);
+			Log.d("TREK", "Running Sound HTTP Grab! BEFORE!!");
+			XMLSoundResponseHandler responseHandler = new XMLSoundResponseHandler();
+			
+			try {
+				
+				return (HashMap<String, Integer>) mClient.execute(request, responseHandler);
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute( HashMap<String, Integer> result) {
+			
+			if (result == null) {
+				Log.d("TREKSOUND", "result is null.. nuts");
+			} else {
+				Log.d("TREKSOUND", "Got to onpost execute (Sound)!");
+				HashMap<String, Integer> resSoundMap = (HashMap<String, Integer>) result;
+				soundHash = resSoundMap;
+				updateSound();				
 				
 			}
 			
@@ -371,9 +614,84 @@ public class MainActivity extends Activity {
 			//		R.layout.list_item, result));
 		}
 
-	}	
+	}		
 	
-    
+	private class TaskHttpGetTask extends AsyncTask<Void, Void, List<Map<String, String>>> {
+
+		//private final String URL = calHttpLocation.concat(endParams);
+		private final String URL = "http://63.226.80.152:8080/nagios/tasks.xml";
+		
+		AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
+		
+		
+		@Override
+		protected List<Map<String, String>> doInBackground(Void... params) {
+
+			Log.d("CURDEBUG", "Running Task HTTP Grab! BEFORE!!" + URL);
+			
+			HttpGet request = new HttpGet(URL);
+			Log.d("TREK", "Running Task HTTP Grab! BEFORE!!");
+			XMLTaskResponseHandler responseHandler = new XMLTaskResponseHandler();
+			
+			try {
+				
+				return (List<Map<String, String>>) mClient.execute(request, responseHandler);	//TODO
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute( List<Map<String, String>> result) {
+			
+			if (result == null) {
+				Log.d("TREKTASK", "result is null.. nuts");
+			} else {
+				Log.d("TREKTASK", "Got to onpost execute (Sound)!");
+				List<Map<String, String>> resTaskList = (List<Map<String, String>>) result;
+				taskList = resTaskList;
+				updateTasks();				
+				
+			}
+			
+
+
+			if (null != mClient)
+				mClient.close();
+			//setListAdapter(new ArrayAdapter<String>(
+			//		NetworkingAndroidHttpClientXMLActivity.this,
+			//		R.layout.list_item, result));
+		}
+
+		private void updateTasks() {
+			// TODO Auto-generated method stub
+			
+			int MAX_DISPLAY = 5;
+			
+			TextViewTrek tvTasks = (TextViewTrek) findViewById(R.id.taskText);
+			
+			String tasksString = "";
+			int x =0;
+			for (Map<String, String> curTaskHash : taskList) {
+				
+				if (x < MAX_DISPLAY) {
+					tasksString = tasksString + curTaskHash.get("title") + "  [" + curTaskHash.get("status") + "]\n";
+				}
+				x++;
+
+				
+			}			
+			tvTasks.setText(tasksString);
+			
+		}
+
+	}			
+	
+	//END
+	
     private void updateTime() {
         TextViewTrek tvDate = (TextViewTrek) findViewById(R.id.textViewTrekDate);
         TextViewTrek tvTime = (TextViewTrek) findViewById(R.id.textViewTrekTime);
@@ -389,6 +707,46 @@ public class MainActivity extends Activity {
     	
     }
 
+	public void updateSound() {
+		
+		Log.d("TREKSOUND", "updatesound() called" );
+		
+		RelativeLayout mainViewScreen = (RelativeLayout) findViewById(R.id.mainViewScreen);
+		if (soundHash.size() > 0 ) {
+			//debugSoundLevel
+			TextViewTrek tvDBSound = (TextViewTrek) findViewById(R.id.debugSoundLevel);
+			int dbSound = (int) soundHash.get("irritation_level");
+			tvDBSound.setText(Integer.toString(dbSound));
+
+/*			Context context = getApplicationContext();
+			CharSequence text = "Updating Sound!";
+			int duration = Toast.LENGTH_SHORT;
+			Toast toast = Toast.makeText(context, text, duration);
+			toast.show();*/
+			
+			ImageView radImage = (ImageView) findViewById(R.id.imageRadLevel);
+			
+			if (dbSound == 0) {
+				radImage.setImageResource(R.drawable.rad_green);
+			} else if (dbSound == 1) {
+				radImage.setImageResource(R.drawable.rad_blue);
+			} else if (dbSound == 2) {
+				radImage.setImageResource(R.drawable.rad_yellow);
+			} else if (dbSound == 3) {
+				radImage.setImageResource(R.drawable.rad_yellow);
+			} else if (dbSound == 4) {
+				radImage.setImageResource(R.drawable.rad_mauve);
+			} else if (dbSound == 5) {
+				radImage.setImageResource(R.drawable.rad_red);
+			} else {
+				radImage.setImageResource(R.drawable.rad_yellow);
+			}
+			
+			radImage.setVisibility(View.VISIBLE);
+			
+		}
+	}
+
 	private void updateCalendar() {
 		RelativeLayout mainViewScreen = (RelativeLayout) findViewById(R.id.mainViewScreen);
 
@@ -402,7 +760,8 @@ public class MainActivity extends Activity {
     	Date tomDate = new Date(dtMili + (60 * 60 * 24 * 1000 * 1 ));
 		
 		if (calHash.size() > 0 ) {
-			Iterator it = calHash.entrySet().iterator();
+			TreeMap<Date, String> calCopy = new TreeMap<Date, String>(calHash);
+			Iterator it = calCopy.entrySet().iterator();
 	
 		    int curCount = 0;
 		    int numberOfItems = calHash.size();
@@ -414,16 +773,15 @@ public class MainActivity extends Activity {
 		    int maxCalDisplayCount = 4;
 		    int todayCount = 0;
 		    int tommCount = 0;
+		    
+		    boolean updatedNextMeeting = false;
+		    
 		    while (it.hasNext()) {
 
 		        Map.Entry pairs = (Map.Entry)it.next();
 		        String eventName =  (String) pairs.getValue();
 		        
-		        boolean updatedNextMeeting = false;
-		        
 		        Date calDate = (Date) pairs.getKey(); 
-		    	
-		        
 		        
 		        if (googleMinMaxForamt.format(calDate).toString().equals( googleMinMaxForamt.format(curDate).toString()  ))  {
 		    		Log.d("TREK", "State : Date is Today!");
@@ -432,6 +790,7 @@ public class MainActivity extends Activity {
 //		    			todayMap.put(calDate, eventName);
 		    			if (updatedNextMeeting == false) {
 		    				updateNextMeetingTime(calDate);
+		    				Log.d("TREK", "Updating Next Meeting!" + calformat.format(calDate));
 		    				updatedNextMeeting = true;
 		    			}
 		    			
@@ -505,13 +864,15 @@ public class MainActivity extends Activity {
     private void updateNextMeetingTime(Date calDate) {
 
     	RelativeLayout mainViewScreen = (RelativeLayout) findViewById(R.id.mainViewScreen);
-    	
+    	SimpleDateFormat calformat = new SimpleDateFormat("HH:mm");    	
 		long dtMili = System.currentTimeMillis();
 		Date curDate = new Date(dtMili);
     	
-    	long diff = calDate.getTime() - curDate.getTime()  + (60 * 60 * 1000 * 4);
-		int diffDays = (int) (diff / (24 * 60 * 60 * 1000));
+    	long diff = calDate.getTime() - curDate.getTime();
+		
+    	int diffDays = (int) (diff / (24 * 60 * 60 * 1000));
 		diff = diff - (long) diffDays * (24 * 60 * 60 * 1000);
+		
 		int diffHours = (int) (diff / (60 * 60 * 1000));
 		diff = diff - (long) diffHours * (60 * 60 * 1000);
 		
@@ -532,7 +893,7 @@ public class MainActivity extends Activity {
 		TextViewTrek tvNextMeeting = (TextViewTrek) findViewById(R.id.textViewNextMeeting);
 	    tvNextMeeting.setText(timeToNextStr);
 	    //tvNextMeeting.setText("blej");
-	    Log.d("TREKDATE", "Writing: " + timeToNextStr );
+	    Log.d("TREKDATE", "Writing Next Time: " + timeToNextStr + " From: " + calformat.format(calDate)  + " and " + calformat.format(curDate));
 	}
 
 	@Override

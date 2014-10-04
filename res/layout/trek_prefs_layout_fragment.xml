@@ -55,6 +55,33 @@
             android:ems="40" />
 
     </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow23"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sound XML Location (http)" />
+	</TableRow>      
+    
+    <TableRow
+        android:id="@+id/tableRow42"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        
+        <EditText
+            android:id="@+id/httpSoundLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="40" />
+
+    </TableRow>
+    
+    
     <TableRow
         android:id="@+id/tableRow5"
         android:layout_width="wrap_content"

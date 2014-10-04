@@ -116,9 +116,15 @@ public class XMLResponseHandler implements ResponseHandler<HashMap<String, Monit
 					int curServiceStatus  = Integer.parseInt(curServiceStatusStr);
 					String curService  = eElement.getElementsByTagName("service_description").item(0).getTextContent();
 					
+					String pluginOutput  = eElement.getElementsByTagName("plugin_output").item(0).getTextContent();
+					
+					
 					curServer = (MonitoredServer) serverHash.get(serverName);
 					
 					int overalServerStatus = Integer.parseInt(curServer.getStatus()); 
+					
+					Log.d("TREKMON", "Adding Service desc: " + curServiceStatusStr + " ^ " +  curServiceStatus+ " : " +  pluginOutput.trim());
+					curServer.addServiceStatus(curService, curServiceStatus, pluginOutput.trim());
 					
 					if (curServiceStatus > overalServerStatus) {
 						// s*@t just got real, yo (sorry, watching the Wire)

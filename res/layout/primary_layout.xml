@@ -8,7 +8,7 @@
     android:minWidth="180dip"
     android:minHeight="100dip"
     android:keepScreenOn="true"
-    android:background="@drawable/lcarstemplate3"     >
+    android:background="@drawable/lcarstemplate6"     >
  
 
             <Space
@@ -57,6 +57,8 @@
         android:shrinkColumns="*"
         android:orientation="vertical"        
     >
+
+
     </TableLayout>     
 
     <TableLayout
@@ -82,6 +84,7 @@
         android:textSize="30sp" 
         foo:customFont="swissbt.ttf"
 />
+
 
 </TableRow>   
 <TableRow
@@ -155,11 +158,11 @@
         android:layout_height="wrap_content"
         android:text="Clear" 
         android:textColor="@color/plain_text"
-        android:textSize="30sp" 
+        android:textSize="44sp" 
         foo:customFont="swissbt.ttf"
         android:layout_below="@id/baseSpace"
         android:layout_marginLeft="750px"
-        android:layout_marginTop="990px"
+        android:layout_marginTop="970px"
         />
         
     
@@ -205,7 +208,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/plain_text"
-        android:textSize="26sp" 
+        android:textSize="30sp" 
         foo:customFont="swissbt.ttf"
  />    
     
@@ -213,4 +216,68 @@
 </TableRow>    
 </TableLayout>
 
+<!--  Temp Volume Output -->    
+<com.henkelsoft.trekyourself.TextViewTrek
+        android:id="@+id/debugSoundLevel"
+        android:text="0"
+        android:scrollHorizontally="false"
+		android:maxWidth="240dip"
+        android:layout_below="@id/baseSpace"    
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/plain_text"
+        android:layout_marginLeft="1580px"
+        android:layout_marginTop="650px"        
+        android:textSize="46sp" 
+        foo:customFont="swissbt.ttf"
+ />    
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/baseSpace"    
+        	android:layout_marginLeft="1410px"
+        	android:layout_marginTop="640px"        
+            android:src="@drawable/radiationblank" />
+
+         <ImageView
+            android:id="@+id/imageRadLevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/baseSpace"    
+        	android:layout_marginLeft="1430px"
+        	android:layout_marginTop="740px"        
+        	android:visibility="invisible"
+            android:src="@drawable/rad_red" />
+        
+
+    <!-- Tasks   -->
+    <com.henkelsoft.trekyourself.TextViewTrek
+        android:id="@+id/taskHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tasks" 
+        android:textColor="@color/h2"
+        android:textSize="34sp" 
+        foo:customFont="swissbt.ttf"
+        android:layout_below="@id/baseSpace"
+        android:layout_marginLeft="385px"
+        android:layout_marginTop="640px"
+        />
+    <com.henkelsoft.trekyourself.TextViewTrek
+        android:id="@+id/taskText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loading.." 
+        android:textColor="@color/plain_text"
+        android:textSize="30sp" 
+        foo:customFont="swissbt.ttf"
+        android:layout_below="@id/taskHeader"
+        android:layout_marginLeft="385px"
+        android:layout_marginTop="5px"
+        />
+                  
+         
+        
+    
 </RelativeLayout>
